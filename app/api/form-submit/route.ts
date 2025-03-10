@@ -2,15 +2,18 @@ import { NextResponse } from "next/server";
 import { promises as fs } from "fs"
 import path from "path";
 import resumeParser from "@/utils/resumeParser";
+import embedResumeData from "@/utils/textEmbedding";
+import storeCandidate from "@/utils/storeCandidate";
+import analyzeResume from "@/utils/analyzeResume";
 
 export async function POST(req: Request) {
     try {
         const form = await req.formData();
 
-        const name = form.get("name");
-        const email = form.get("email");
-        const linkedinUrl = form.get("linkedinUrl");
-        const skills = form.get("skills");
+        const name = form.get("name") as string;
+        const email = form.get("email") as string;
+        const linkedinUrl = form.get("linkedinUrl") as string;
+        const skills = form.get("skills") as string;
         const resume = form.get("resume") as File;
 
         console.log(form);
@@ -25,10 +28,25 @@ export async function POST(req: Request) {
         const buffer = Buffer.from(await resume.arrayBuffer());
         await fs.writeFile(path.join(process.cwd(), "/public/upload/", resume.name), buffer);
         let resumeData = await resumeParser(buffer);
+        await fs.unlink(path.join(process.cwd(), '/public/upload/', resume.name))
+
+        const embeddedData = await embedResumeData(resumeData);
+        const analysis = await analyzeResume(resumeData);
+
+        const candidateData = {
+            name,
+            email,
+            linkedinUrl,
+            skills,
+            resumeData: embeddedData,
+        }
+
+        await storeCandidate(candidateData);
         
         return NextResponse.json({
-            message: "Form submit",
+            message: "Form submit and candidate data added",
             pdfData: resumeData,
+            analysis,
             success: true
         }, {status: 200})
         

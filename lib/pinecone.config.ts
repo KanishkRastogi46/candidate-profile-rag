@@ -4,19 +4,24 @@ const pc = new Pinecone({
   apiKey: String(process.env.PINECONE_API_KEY)
 });
 
-const indexName = "candidate-profile-rag";
+async function initPinecone() {
+    // const indexList = await pc.listIndexes();
+    const indexName = "candidate-rag";
+  
+      await pc.createIndex({
+        name: indexName,
+        vectorType: "dense",
+        dimension: 768, 
+        metric: 'cosine', 
+        spec: { 
+          serverless: { 
+            cloud: 'aws', 
+            region: 'us-east-1' 
+          }
+        } 
+      });
+}
 
-pc.createIndexForModel({
-    name: indexName,
-    cloud: 'aws',
-    region: 'us-east-1',
-    embed: {
-        model: 'llama-text-embed-v2',
-        fieldMap: { text: 'chunk_text' },
-    },
-    waitUntilReady: true,
-})
 
-const index = pc.index(indexName);
-
-export default index;
+initPinecone()
+export default pc;
