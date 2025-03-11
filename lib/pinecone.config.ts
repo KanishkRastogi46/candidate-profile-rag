@@ -5,9 +5,12 @@ const pc = new Pinecone({
 });
 
 async function initPinecone() {
-    // const indexList = await pc.listIndexes();
+  try {
+    const indexList = await pc.listIndexes();
     const indexName = "candidate-rag";
+    const list = indexList.indexes?.filter(index => index.name === indexName)
   
+    if (list?.length === 0) {
       await pc.createIndex({
         name: indexName,
         vectorType: "dense",
@@ -20,8 +23,51 @@ async function initPinecone() {
           }
         } 
       });
+    }
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 
-initPinecone()
+initPinecone().then(_=>{console.log("Pinecone initialized")}).catch(err => {console.log(err.message)});
+
 export default pc;
+
+/*
+  indexes: [
+    {
+      name: 'candidate-rag',
+      dimension: 768,
+      metric: 'cosine',
+      host: 'candidate-rag-ctglsyg.svc.aped-4627-b74a.pinecone.io',
+      deletionProtection: 'disabled',
+      tags: undefined,
+      embed: undefined,
+      spec: [Object],
+      status: [Object],
+      vectorType: 'dense'
+    }
+  ]
+}
+{
+  matches: [
+    {
+      id: 'rahul@gmail.com',
+      score: 0.604410052,
+      values: [],
+      sparseValues: undefined,
+      metadata: [Object]
+    },
+    {
+      id: 'kan@gmail.com',
+      score: 0.459197342,
+      values: [],
+      sparseValues: undefined,
+      metadata: [Object]
+    }
+  ],
+  namespace: '',
+  usage: { readUnits: 6 }
+}
+*/

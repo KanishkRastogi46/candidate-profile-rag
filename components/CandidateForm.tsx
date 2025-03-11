@@ -2,6 +2,8 @@
 
 import { FormEvent, useState } from "react";
 import axios from "axios";
+import Link from "next/link";
+import CandidateProfile from "./CandidateProfile";
 
 type formDataType = {
   name: string;
@@ -20,6 +22,8 @@ export default function CandidateForm() {
     resume: null as File | null,
   });
   const [err, setErr] = useState<string>();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [analysis, setAnalysis] = useState<string>("");
 
   const handleSubmit = async function (e: FormEvent) {
     e.preventDefault();
@@ -31,18 +35,24 @@ export default function CandidateForm() {
     formData.append("skills", form.skills);
     formData.append("resume", form.resume || "");
 
+    setLoading(true)
     try {
         let res = await axios.post("/api/form-submit", formData);
-        if (res.data.success === true) console.log(res.data);
+        if (res.data.success === true) {
+          console.log(res.data);
+          setAnalysis(res.data.analysis.feedback);
+        }
     } catch (error: any) {
         console.log(error)
         setErr(error.message)
+    } finally {
+        setLoading(false)
     }
   }
 
   return (
     <>
-      <div className="max-w-md mx-auto mt-10 p-5 border rounded-lg bg-white shadow-2xl">
+      <div className="min-w-md mx-auto mt-10 p-5 border rounded-lg bg-white shadow-2xl">
         {err && <p className="text-red-500">{err}</p>}
         <h2 className="text-xl font-bold mb-4 text-black">Candidate Application</h2>
         <form className="flex flex-col justify-center gap-6">
@@ -90,11 +100,16 @@ export default function CandidateForm() {
             type="submit"
             className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
             onClick={handleSubmit}
+            disabled={loading}
           >
-            Submit
+            {loading ? "Submitting..." : "Submit"}
           </button>
         </form>
+        <Link href={"/job-form"} className="text-blue-500 text-sm">
+          Store job description
+        </Link>
       </div>
+      {analysis && <CandidateProfile analysis={analysis}/>}
     </>
   );
 }

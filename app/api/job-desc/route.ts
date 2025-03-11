@@ -20,6 +20,7 @@ export async function POST(req: Request) {
 
         return Response.json({
             message: "Query successful",
+            queryRes,
             success: true
         }, {status: 200})
 
