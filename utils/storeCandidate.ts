@@ -9,16 +9,20 @@ type candidateDataType = {
 }
 
 export default async function storeCandidate(candidateData: candidateDataType) {
-    const index = pc.index("candidate-rag");
-    await index.upsert([
-        {
-            id: candidateData.email,
-            values: candidateData.resumeData,
-            metadata: {
-                name: candidateData.name,
-                linkedinUrl: candidateData.linkedinUrl,
-                skills: candidateData.skills
+    try {
+        const index = pc.index("candidate-rag");
+        await index.upsert([
+            {
+                id: candidateData.email,
+                values: candidateData.resumeData,
+                metadata: {
+                    name: candidateData.name,
+                    linkedinUrl: candidateData.linkedinUrl,
+                    skills: candidateData.skills
+                }
             }
-        }
-    ])
+        ])
+    } catch (error: any) {
+        console.log(error.message);
+    }
 }
