@@ -1,7 +1,6 @@
 import { SignUp } from "@clerk/nextjs";
 
-
-export default function SignupPage() {
+export default function SignUpPage() {
     return (
         <>
             <div className="flex justify-center items-center h-screen w-screen">
