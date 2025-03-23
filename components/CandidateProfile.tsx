@@ -1,3 +1,5 @@
+import Markdown from "react-markdown";
+
 export default function CandidateProfile({ analysis }: { analysis: string }) {
   return (
     <div className="max-w-md mx-auto mt-10 p-5 border rounded-lg bg-white shadow-2xl">

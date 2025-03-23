@@ -40,7 +40,7 @@ export default function CandidateForm() {
         let res = await axios.post("/api/form-submit", formData);
         if (res.data.success === true) {
           console.log(res.data);
-          setAnalysis(res.data.analysis.feedback);
+          setAnalysis(`# Summary ${res.data.analysis.summary} # Evaluation ${res.data.analysis.Evaluation} # Feedback ${res.data.analysis.feedback}`);
         }
     } catch (error: any) {
         console.log(error)
